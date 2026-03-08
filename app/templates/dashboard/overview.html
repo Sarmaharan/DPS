@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - DPS{% endblock %}
+{% block content %}
+<h1>Analytics Dashboard</h1>
+<p style="color: var(--text-muted); margin-bottom: 2rem;">Overview of patient data and ML model performance</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: var(--accent-teal);">{{ total_patients }}</div>
+        <div style="color: var(--text-muted);">Total Patients</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: var(--accent-blue);">{{ total_predictions }}</div>
+        <div style="color: var(--text-muted);">Total Predictions</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: var(--accent-green);">{{ risk_breakdown.low }}</div>
+        <div style="color: var(--text-muted);">Low Risk</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: var(--accent-amber);">{{ risk_breakdown.medium }}</div>
+        <div style="color: var(--text-muted);">Medium Risk</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: var(--accent-red);">{{ risk_breakdown.high }}</div>
+        <div style="color: var(--text-muted);">High Risk</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <div class="card">
+        <h2>Risk Distribution</h2>
+        <canvas id="riskChart" width="400" height="200"></canvas>
+    </div>
+    <div class="card">
+        <h2>Model Accuracy Comparison</h2>
+        <table>
+            <thead>
+                <tr><th>Model</th><th>Accuracy</th></tr>
+            </thead>
+            <tbody>
+                {% for m in model_metrics %}
+                <tr>
+                    <td>{{ m.model }}</td>
+                    <td>{{ "%.2f"|format(m.accuracy * 100) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Low', 'Medium', 'High'],
+            datasets: [{
+                data: [{{ risk_breakdown.low }}, {{ risk_breakdown.medium }}, {{ risk_breakdown.high }}],
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+</script>
+{% endblock %}

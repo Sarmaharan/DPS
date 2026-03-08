@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DPS - Diabetes Prediction System{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #0f1419; --bg-card: #1a2332; --accent-teal: #14b8a6; --accent-blue: #3b82f6; --accent-amber: #f59e0b; --accent-red: #ef4444; --accent-green: #10b981; --text-primary: #f1f5f9; --text-muted: #94a3b8; --border: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 1.5rem 0; }
+        .sidebar-brand { padding: 0 1.5rem 1.5rem; font-weight: 700; font-size: 1.25rem; color: var(--accent-teal); border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+        .sidebar-nav a { display: block; padding: 0.75rem 1.5rem; color: var(--text-muted); text-decoration: none; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { color: var(--accent-teal); background: rgba(20,184,166,0.1); }
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .flash { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
+        .flash.success { background: rgba(16,185,129,0.2); color: var(--accent-green); }
+        .flash.error { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+        .flash.info { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
+        .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 500; cursor: pointer; border: none; font-family: inherit; }
+        .btn-primary { background: var(--accent-teal); color: var(--bg-dark); }
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-primary); font-family: inherit; }
+        .risk-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; font-size: 0.85rem; }
+        .risk-low { background: rgba(16,185,129,0.2); color: var(--accent-green); }
+        .risk-medium { background: rgba(245,158,11,0.2); color: var(--accent-amber); }
+        .risk-high { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; }
+        .user-menu { margin-top: auto; padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+    <div class="{% if current_user.is_authenticated %}layout{% endif %}">
+        {% if current_user.is_authenticated %}
+        <aside class="sidebar">
+            <div class="sidebar-brand">DPS</div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard.overview') }}">Dashboard</a>
+                <a href="{{ url_for('patient.list_patients') }}">Patients</a>
+                <a href="{{ url_for('patient.register') }}">Register Patient</a>
+                <a href="{{ url_for('prediction.new') }}">New Prediction</a>
+                <a href="{{ url_for('report.summary_report') }}">Summary Report</a>
+            </nav>
+            <div class="user-menu">
+                <div>{{ current_user.username }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ current_user.role }}</div>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary" style="margin-top: 0.5rem;">Logout</a>
+            </div>
+        </aside>
+        {% endif %}
+        <main class="main-content" {% if not current_user.is_authenticated %}style="max-width: 480px; margin: 0 auto; padding: 4rem 2rem;"{% endif %}>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

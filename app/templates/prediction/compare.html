@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Model Comparison - DPS{% endblock %}
+{% block content %}
+<h1>Multi-Model Comparison</h1>
+<p style="color: var(--text-muted);">Prediction #{{ prediction.id }} for {{ prediction.patient.first_name }} {{ prediction.patient.last_name }}</p>
+<div class="card" style="margin: 1.5rem 0;">
+    <p><span class="risk-badge risk-{{ prediction.risk_level }}">{{ prediction.risk_level|upper }}</span> - {{ "%.1f"|format(prediction.probability * 100) }}%</p>
+</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>Model</th><th>Probability</th><th>Risk Level</th></tr>
+        </thead>
+        <tbody>
+            {% for m in (prediction.model_comparison or []) %}
+            <tr>
+                <td>{{ m.model }}</td>
+                <td>{{ "%.1f"|format(m.probability * 100) }}%</td>
+                <td><span class="risk-badge risk-{{ m.risk_level }}">{{ m.risk_level|upper }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No comparison data.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<a href="{{ url_for('patient.view', id=prediction.patient.id) }}" class="btn btn-secondary">Back to Patient</a>
+{% endblock %}

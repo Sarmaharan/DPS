@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Patient {{ patient.patient_id }} - DPS{% endblock %}
+{% block content %}
+<h1>{{ patient.first_name }} {{ patient.last_name }}</h1>
+<p style="color: var(--text-muted);">Patient ID: {{ patient.patient_id }}</p>
+<div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+    <a href="{{ url_for('patient.edit', id=patient.id) }}" class="btn btn-secondary">Edit</a>
+    <a href="{{ url_for('prediction.new') }}?patient={{ patient.id }}" class="btn btn-primary">New Prediction</a>
+    <a href="{{ url_for('report.patient_report', patient_id=patient.id) }}" class="btn btn-secondary">Download Report</a>
+</div>
+<div class="card">
+    <h2>Demographics</h2>
+    <table>
+        <tr><th>Date of Birth</th><td>{{ patient.date_of_birth }}</td></tr>
+        <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
+        <tr><th>Contact</th><td>{{ patient.contact_number or '-' }}</td></tr>
+        <tr><th>Email</th><td>{{ patient.email or '-' }}</td></tr>
+        <tr><th>Address</th><td>{{ patient.address or '-' }}</td></tr>
+    </table>
+</div>
+<div class="card">
+    <h2>Prediction History</h2>
+    <table>
+        <thead>
+            <tr><th>Date</th><th>Risk Level</th><th>Probability</th><th>Models</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for pred in predictions %}
+            <tr>
+                <td>{{ pred.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td><span class="risk-badge risk-{{ pred.risk_level }}">{{ pred.risk_level|upper }}</span></td>
+                <td>{{ "%.1f"|format(pred.probability * 100) }}%</td>
+                <td>{{ pred.primary_model or 'Ensemble' }}</td>
+                <td><a href="{{ url_for('prediction.compare', id=pred.id) }}" class="btn btn-secondary" style="padding: 0.35rem 0.6rem;">Compare</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No predictions yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

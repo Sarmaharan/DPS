@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Prediction Result - DPS{% endblock %}
+{% block content %}
+<h1>Prediction Result</h1>
+<p style="color: var(--text-muted);">Patient: {{ patient.first_name }} {{ patient.last_name }} ({{ patient.patient_id }})</p>
+<div class="card" style="max-width: 500px; margin: 1.5rem 0;">
+    <h2 style="margin-bottom: 1rem;">Risk Classification</h2>
+    <p><span class="risk-badge risk-{{ result.risk_level }}" style="font-size: 1.1rem;">{{ result.risk_level|upper }}</span></p>
+    <p style="margin-top: 0.5rem; color: var(--text-muted);">Probability: {{ "%.1f"|format(result.probability * 100) }}%</p>
+    <p style="font-size: 0.9rem; color: var(--text-muted);">Model: {{ result.primary_model }}</p>
+</div>
+<div class="card">
+    <h2>Multi-Model Comparison</h2>
+    <table>
+        <thead>
+            <tr><th>Model</th><th>Probability</th><th>Risk Level</th><th>Prediction</th></tr>
+        </thead>
+        <tbody>
+            {% for m in result.model_comparison %}
+            <tr>
+                <td>{{ m.model }}</td>
+                <td>{{ "%.1f"|format(m.probability * 100) }}%</td>
+                <td><span class="risk-badge risk-{{ m.risk_level }}">{{ m.risk_level|upper }}</span></td>
+                <td>{{ 'Positive' if m.prediction else 'Negative' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div>
+    <a href="{{ url_for('patient.view', id=patient.id) }}" class="btn btn-primary">View Patient</a>
+    <a href="{{ url_for('prediction.new') }}" class="btn btn-secondary">New Prediction</a>
+    <a href="{{ url_for('report.patient_report', patient_id=patient.id) }}" class="btn btn-secondary">Download Report</a>
+</div>
+{% endblock %}

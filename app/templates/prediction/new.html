@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}New Prediction - DPS{% endblock %}
+{% block content %}
+<h1>Diabetes Risk Prediction</h1>
+<p style="color: var(--text-muted); margin-bottom: 1.5rem;">Enter clinical parameters for AI-based risk assessment</p>
+<div class="card">
+    <form method="POST" action="{{ url_for('prediction.new') }}">
+        <div class="form-group">
+            <label for="patient_id">Select Patient</label>
+            <select id="patient_id" name="patient_id" required>
+                <option value="">-- Select Patient --</option>
+                {% for p in patients %}
+                <option value="{{ p.id }}" {% if request.args.get('patient') == p.id|string %}selected{% endif %}>{{ p.patient_id }} - {{ p.first_name }} {{ p.last_name }}</option>
+                {% endfor %}
+            </select>
+            {% if not patients %}
+            <p style="color: var(--accent-amber); margin-top: 0.5rem;">No patients registered. <a href="{{ url_for('patient.register') }}" style="color: var(--accent-teal);">Register a patient first</a>.</p>
+            {% endif %}
+        </div>
+        <h3 style="margin: 1.5rem 0 1rem;">Clinical Features</h3>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div class="form-group">
+                <label for="pregnancies">Pregnancies</label>
+                <input type="number" id="pregnancies" name="pregnancies" min="0" step="1" value="0" required>
+            </div>
+            <div class="form-group">
+                <label for="glucose">Glucose (mg/dL)</label>
+                <input type="number" id="glucose" name="glucose" min="0" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="blood_pressure">Blood Pressure (mm Hg)</label>
+                <input type="number" id="blood_pressure" name="blood_pressure" min="0" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="skin_thickness">Skin Thickness (mm)</label>
+                <input type="number" id="skin_thickness" name="skin_thickness" min="0" step="0.1" value="0" required>
+            </div>
+            <div class="form-group">
+                <label for="insulin">Insulin (mu U/ml)</label>
+                <input type="number" id="insulin" name="insulin" min="0" step="0.1" value="0" required>
+            </div>
+            <div class="form-group">
+                <label for="bmi">BMI</label>
+                <input type="number" id="bmi" name="bmi" min="0" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="diabetes_pedigree">Diabetes Pedigree</label>
+                <input type="number" id="diabetes_pedigree" name="diabetes_pedigree" min="0" step="0.01" value="0" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age (years)</label>
+                <input type="number" id="age" name="age" min="1" step="1" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Run Prediction</button>
+    </form>
+</div>
+{% endblock %}
